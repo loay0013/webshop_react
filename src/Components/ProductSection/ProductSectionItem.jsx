@@ -3,80 +3,56 @@ import { Card, CardHeader, CardBody, CardFooter, Typography, Tooltip, Button } f
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../features/slices/cartSlice";
 import { useNavigate } from "react-router-dom"; // Import useNavigate hook
-
 const ProductSectionItem = ({
-                              id,
-                              img,
-                              name,
-                              text,
-                              size,
-                              price,
-                              color,
-                              totalPrice,
+                                id,
+                                img, // Dette vil nu være strDrinkThumb fra API
+                                name, // Dette vil nu være strDrink fra API
+                                text, // Dette kan være strInstructions eller anden beskrivende tekst fra API
                             }) => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate(); // Initialize navigate function
+    const dispatch = useDispatch();
+    const navigate = useNavigate(); // Initialize navigate function
 
-  const defaultSize = size[0];
-  const defaultColor = color[0];
+    // Funktion til at håndtere klik og navigere til produktdetaljer
+    const handleProductClick = () => {
+        navigate(`/product/${id}`); // Naviger til produktdetaljesiden
+    };
 
-  // Function to handle click and navigate to product details
-  const handleProductClick = () => {
-    navigate(`/product/${id}`); // Navigate to product details page
-  };
+    return (
+        <div onClick={handleProductClick} className="cursor-pointer">
+            <Card className="w-96 relative">
+                <CardHeader floated={false} className="h-96">
+                    <img src={img} alt={name} />
+                </CardHeader>
+                <CardBody className="text-center">
+                    <Typography variant="h4" color="blue-gray" className="mb-2">
+                        {name}
+                    </Typography>
 
-  return (
-      <div onClick={handleProductClick} className="cursor-pointer">
-        <Card className="w-96 relative">
-          <Typography
-              variant="h4"
-              className="mb-2 absolute -rotate-45 top-12 right-8 z-10 text-red-700"
-          >
-            SALE%
-          </Typography>
-          <CardHeader floated={false} className="h-96">
-            <img src={img} alt={name} />
-          </CardHeader>
-          <CardBody className="text-center">
-            <Typography variant="h4" color="blue-gray" className="mb-2">
-              {name}
-            </Typography>
-            <Typography color="gray" className="font-medium" textGradient>
-              {text}
-            </Typography>
-            <div className="flex justify-between items-center pt-4">
-              <Typography color="red" className="font-medium" textGradient>
-                Size left: <span className="text-gray-400 text-base font-extralight">{defaultSize}</span>
-              </Typography>
-              <Typography color="gray" className="font-medium" textGradient>
-                Color: <span className="px-2 rounded-full ml-2" style={{ backgroundColor: defaultColor }}></span>
-              </Typography>
-            </div>
-          </CardBody>
-          <CardFooter className="flex justify-center gap-7 pt-2">
-            <Tooltip content="Add to Cart" placement="bottom">
-              <Button
-                  onClick={(e) => {
-                    e.stopPropagation(); // Prevent navigating when clicking the button
-                    dispatch(
-                        addToCart({
-                          id,
-                          img,
-                          amount: 1,
-                          price,
-                          name,
-                        })
-                    );
-                  }}
-                  ripple={true}
-              >
-                Add to Cart
-              </Button>
-            </Tooltip>
-          </CardFooter>
-        </Card>
-      </div>
-  );
+                </CardBody>
+                <CardFooter className="flex justify-center gap-7 pt-2">
+                    <Tooltip content="Add to Cart" placement="bottom">
+                        <Button
+                            onClick={(e) => {
+                                e.stopPropagation(); // Forhindrer navigation ved klik på knappen
+                                dispatch(
+                                    addToCart({
+                                        id,
+                                        img,
+                                        name,
+                                        // Antag at vi tilføjer en standardpris, da API'et ikke leverer en
+                                        price: "100", // Dette er et eksempel, juster efter behov
+                                    })
+                                );
+                            }}
+                            ripple={true}
+                        >
+                            Add to Cart
+                        </Button>
+                    </Tooltip>
+                </CardFooter>
+            </Card>
+        </div>
+    );
 };
 
 export default ProductSectionItem;

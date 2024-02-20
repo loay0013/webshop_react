@@ -1,31 +1,40 @@
-import React, { useState } from "react";
-import { storeData } from "../../assets/data/dummyData";
+import React, { useState, useEffect } from "react";
 import ProductSectionItem from "./ProductSectionItem";
 
 const ProductSection = () => {
+    const [products, setProducts] = useState([]);
     const [visibleProductsCount, setVisibleProductsCount] = useState(10);
 
+    useEffect(() => {
+        // Her antager vi, at API'et returnerer en liste af produkter
+        fetch('https://www.thecocktaildb.com/api/json/v1/1/search.php?f=a') // Skift URL til din produkts API
+            .then(response => response.json())
+            .then(data => {
+                // Antag at dataen fra API'en matcher den struktur, du har brug for. Juster dette efter behov.
+                setProducts(data.drinks); // Skift "drinks" til den faktiske nøgle, der indeholder produktdata
+            })
+            .catch(error => console.error('Error fetching product data:', error));
+    }, []); // Tomt array sikrer, at dette kun køres ved komponentens første mount
+
     const handleLoadMore = () => {
-        setVisibleProductsCount((prevCount) => Math.min(prevCount + 10, storeData.length)); // Avoid exceeding the total number of products
+        setVisibleProductsCount(prevCount => Math.min(prevCount + 10, products.length)); // Brug products.length i stedet for storeData.length
     };
 
-    // Check if all products have been loaded
-    const allProductsLoaded = visibleProductsCount >= storeData.length;
+    // Tjek, om alle produkter er blevet indlæst
+    const allProductsLoaded = visibleProductsCount >= products.length;
 
     return (
         <div>
             <div className="grid grid-cols-3 justify-items-center py-8 gap-4 mx-auto max-w-7xl">
-                {storeData.slice(0, visibleProductsCount).map((product, index) => (
+                {products.slice(0, visibleProductsCount).map((product, index) => (
                     <div key={index}>
                         <ProductSectionItem
-                            id={product.id}
-                            name={product.name}
-                            img={product.img}
-                            text={product.text}
-                            price={product.price}
-                            totalPrice={product.totalPrice}
-                            color={product.color}
-                            size={product.size}
+                            id={product.idDrink} // Juster disse props efter dit API's responsstruktur
+                            name={product.strDrink}
+                            img={product.strDrinkThumb} // Eksempel på en thumbnail. Skift dette til din faktiske billedprop
+                            text={product.strInstructions} // Dette er bare et eksempel, skift til relevant prop
+                            price={product.price} // Antager at din API inkluderer pris, ellers fjern eller erstat
+                            // Fjern de props der ikke matcher din API's data
                         />
                     </div>
                 ))}
